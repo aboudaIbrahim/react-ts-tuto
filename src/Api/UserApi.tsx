@@ -2,7 +2,7 @@ import React from "react";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export type User = {
-  name: string;
+  name?: string;
   email: string;
   password: string;
 };
@@ -18,9 +18,9 @@ export const userApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:80/api/users" }),
   tagTypes: ["User"],
   endpoints: (builder) => ({
-    // todos: builder.query<Data, void>({
-    //   query: () => "/list",
-    //   providesTags: ["Todo"],
+    // users: builder.query<Data, void>({
+    //   query: () => "/",
+    //   providesTags: ["User"],
     // }),
     addUser: builder.mutation<void, User>({
       query: (user) => ({
@@ -30,12 +30,12 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
-    // deleteTodo: builder.mutation<void, Todo>({
-    //   query: (id) => ({
+    // login: builder.mutation<void, Todo>({
+    //   query: ({email , password , ...rest}) => ({
     //     url: "/delete",
-    //     method: "DELETE",
+    //     method: "POST",
     //   }),
-    //   invalidatesTags: ["Todo"],
+    //   invalidatesTags: ["User"],
     // }),
   }),
 });
