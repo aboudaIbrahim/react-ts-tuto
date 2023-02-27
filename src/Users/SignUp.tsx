@@ -1,5 +1,8 @@
 import React, { ChangeEvent, useState } from "react";
 import { useAddUserMutation } from "../Api/UserApi";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,7 +15,32 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Alert } from "@mui/material";
 
-export const SignUp = () => {
+type validateFormInputs = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+const schema = yup.object().shape({
+  name: yup.string().required("name is required"),
+  email: yup.string().required("email is required ").email("email is invalid"),
+  password: yup
+    .string()
+    .min(6, "password must be at least 6 characters")
+    .max(12, "password must not exceed 12 characters")
+    .required("password is required"),
+});
+
+export const SignUp: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<validateFormInputs>({
+    resolver: yupResolver(schema),
+  });
+
   const [addUser, { isSuccess, error }] = useAddUserMutation();
 
   const [name, setName] = useState<string>("");
@@ -29,9 +57,12 @@ export const SignUp = () => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const user = { name, email, password };
+  const onSubmitHandler = async (data: validateFormInputs) => {
+    const user = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
     await addUser(user);
     setName("");
     setEmail("");
@@ -55,44 +86,49 @@ export const SignUp = () => {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+        <Box
+          component="form"
+          noValidate
+          onSubmit={handleSubmit(onSubmitHandler)}
+          sx={{ mt: 3 }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                required
                 fullWidth
                 id="name"
                 label="Name"
-                name="name"
                 autoComplete="family-name"
                 value={name}
+                {...register("name")}
                 onChange={onChangeNameHandler}
               />
+              <div>{errors.name?.message}</div>
             </Grid>
             <Grid item xs={12}>
               <TextField
-                required
                 fullWidth
                 id="email"
                 label="Email Address"
-                name="email"
                 autoComplete="email"
                 value={email}
+                {...register("email")}
                 onChange={onChangeEmailHandler}
               />
+              <div>{errors.email?.message}</div>
             </Grid>
             <Grid item xs={12}>
               <TextField
-                required
                 fullWidth
-                name="password"
                 label="Password"
                 type="password"
                 id="password"
                 autoComplete="new-password"
                 value={password}
+                {...register("password")}
                 onChange={onChangePasswordHandler}
               />
+              <div>{errors.password?.message}</div>
             </Grid>
           </Grid>
           <Button
@@ -105,7 +141,7 @@ export const SignUp = () => {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link href="/login" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>

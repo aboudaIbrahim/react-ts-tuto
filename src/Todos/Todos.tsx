@@ -1,7 +1,8 @@
 import React from "react";
 import { Box, Grid } from "@mui/material";
 import { TodoItem } from "./TodoItem";
-import { useTodosQuery } from "../Api/TodoApi";
+import { useTodosQuery } from "../Api/TodoApi"; 
+
 export type Todo = {
   id?: number;
   title: string;
@@ -10,7 +11,7 @@ export type Todo = {
 
 
 export const Todos = () => {
-  const { data, error, isFetching, isLoading, isSuccess } = useTodosQuery();
+  const { data, error, isFetching, isLoading, isSuccess , refetch } = useTodosQuery();
   return (
     <Box sx={{ flexGrow: 1, mt: 3, padding: 8 }}>
       {isLoading && <h2>...Loading</h2>}
